@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+    .flex-row {
+      display: flex;
+    }
+
+    .flex-column {
+      display: flex;
+      flex-direction: column;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="flex-row">
+    <div class="flex-column">
+      <h2>测试请求</h2>
+      <label for="url">
+        请求地址<input type="text" id="url">
+      </label>
+      <label for="method">
+        method<input type="text" id="method">
+      </label>
+      <label for="data">
+        data<input type="text" id="data">
+      </label>
+
+      <button id="req-default">使用本页请求</button>
+      <button id="req-background">使用background请求</button>
+    </div>
+    <!-- <div>
+      结果
+      <textarea name="" id="result" cols="30" rows="10"></textarea>
+    </div> -->
+  </div>
+  <script src="a.js"></script>
+</body>
+
+</html>

@@ -12,6 +12,8 @@ logs/
 *.js
 !.autod.conf.js
 !app.js
+!login_plunin/*.js
+!testpage/*.js
 
 app/**/*.js
 test/**/*.js
