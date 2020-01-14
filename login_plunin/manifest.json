@@ -1,6 +1,5 @@
 {
 	"manifest_version": 2,
-
 	"name": "One-click Kittens",
 	"description": "This extension demonstrates a browser action with kittens.",
 	"version": "1.0",
@@ -13,10 +12,21 @@
 		"default_popup": "popup.html"
 	},
 	"background": {
-		"scripts": ["background.js"]
+		"scripts": [
+			"background.js"
+		]
 	},
-	"content_scripts": [{
-		"matches": ["http://127.0.0.1/"],
-		"js": ["content_script.js"]
-	}]
+	"web_accessible_resources": [
+		"/*"
+	],
+	"content_scripts": [
+		{
+			"matches": [
+				"http://127.0.0.1/"
+			],
+			"js": [
+				"content_script.js"
+			]
+		}
+	]
 }

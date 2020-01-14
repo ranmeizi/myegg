@@ -2,6 +2,8 @@ let iptUrl = document.getElementById('url')
 let iptMethod = document.getElementById('method')
 let iptData = document.getElementById('data')
 
+let $ChromeEventBus = null
+
 document.getElementById('req-default').addEventListener('click', () => {
   let url = iptUrl.value
   let method = iptMethod.value
@@ -11,26 +13,26 @@ document.getElementById('req-default').addEventListener('click', () => {
   XHR.open(method, url)
   XHR.send(JSON.stringify(data))
 })
-
-let $chrome_api = new EventBus()
-
-class EventBus {
-  constructor() {
-    this.allEvent = {}
+document.getElementById('req-background').addEventListener('click', () => {
+  let url = iptUrl.value
+  let method = iptMethod.value
+  let data = iptData.value
+  let option = {
+    url,
+    method,
+    data
   }
-  on(eventName, callback) {
-    this.allEvent[eventName] = [
-      ...(this.allEvent[eventName] || []),
-      callback
-    ]
-  }
-  emit(eventName, data) {
-    const emitList = this.allEvent[eventName] || []
-    emitList.forEach(fn => fn(data))
-  }
-  un(eventName, callback) {
-    const emitList = this.allEvent[eventName] || []
-    const index = emitList.find(fn === callback)
-    emitList.splice(index, 1)
-  }
+  $ChromeEventBus.dataset['eventData'] = JSON.stringify(option)
+  const e = new Event('request_proxy')
+  $ChromeEventBus.dispatchEvent(e)
+})
+document.body.addEventListener('content_script_Ready', Init)
+function Init() {
+  console.log('hssss', document.body)
+  $ChromeEventBus = document.getElementById('chrome_eventBus')
+  console.log($ChromeEventBus)
+  $ChromeEventBus.addEventListener('response', function (e) {
+    let { eventData } = e.target.dataset
+    console.log('response', JSON.parse(eventData))
+  })
 }
