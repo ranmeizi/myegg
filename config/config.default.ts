@@ -17,7 +17,16 @@ export default (appInfo: EggAppInfo) => {
 	config.security = {
 		csrf: {
 			enable: false,
+			ignoreJSON: true
 		},
+		domainWhiteList: ['http://localhost:8080'],//允许访问接口的白名单
+	};
+	config.jwt = {
+		secret: "123456"//自定义 token 的加密条件字符串
+	};
+	config.cors = {
+		origin: '*',
+		allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH'
 	};
 
 	// the return config will combines to EggAppConfig

@@ -1,7 +1,7 @@
 import { Controller } from 'egg';
 
 export default class login extends Controller {
-	public async index() {
+	public async getToken() {
 		const { ResponseCode } = this.ctx.app.locals;
 		const { ctx } = this;
 		const { uname, psw } = ctx.request.body;
