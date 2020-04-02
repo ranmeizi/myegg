@@ -28,6 +28,14 @@ export default (appInfo: EggAppInfo) => {
 		origin: '*',
 		allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH'
 	};
+	config.sequelize = {
+		dialect: 'mysql', // support: mysql, mariadb, postgres, mssql
+		database: 'DG_GAME',
+		host: '127.0.0.1',
+		port: 3306,
+		username: 'root',
+		password: 'UltraTel@5266',
+	};
 
 	// the return config will combines to EggAppConfig
 	return {

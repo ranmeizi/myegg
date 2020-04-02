@@ -1,5 +1,6 @@
 import { Service } from 'egg';
-import { USER_DATA } from '../../fack/user';
+import { USER_DATA } from '../fack/user';
+import * as CryptoJS from 'crypto-js'
 
 export default class login extends Service {
 	public async loginValidate(uname: string, psw: string): Promise<number> {
@@ -52,4 +53,34 @@ export default class login extends Service {
 		console.log(uname);
 		return 'woshi token';
 	}
+	/**
+	 * 生成盐
+	 */
+	public createSalt(): string {
+		const str: string = 'Pneumonoultramicroscopicsilicovolcanoconiosis'
+		let salt: string = ''
+		for (let i = 0; i < 10; i++) {
+			// 随机获取一个字
+			salt += str[Math.round(Math.random() * str.length)]
+		}
+		return salt
+	}
+	/**
+	 * 生成捣乱的密码密文
+	 * @param salt 
+	 * @param psw 
+	 */
+	public createSaltyPsw(salt: string, psw: string) {
+		const hash: string = CryptoJS.SHA256(psw + salt)
+		return hash
+	}
+
+	public async createNewMember(): Promise<number> {
+		return 1
+	}
+
+	public async createUser() {
+
+	}
+
 }

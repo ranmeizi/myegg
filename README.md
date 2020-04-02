@@ -7,9 +7,9 @@
       试试
       看
 
+# 初始模块
+      egg-jwt egg-cors egg-sequelize
+# 数据表
 
-# 谷歌插件跨域
-      /login_plugin 里面是谷歌插件，测试中
-
-# 测试页面
-      /testpage 里面是测试页面
+# 功能
+      1.登录/权限

@@ -2,7 +2,6 @@ import { Service } from 'egg';
 
 export default class test extends Service {
 	public async format(code: number, data: any = null) {
-		console.log('code', code);
 		const { ResponseCode } = this.ctx.app.locals;
 		return {
 			code,
