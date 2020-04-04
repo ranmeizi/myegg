@@ -5,3 +5,7 @@ declare module 'egg' {
     jwt: any;
   }
 }
+
+declare module 'crypto-js' {
+  export default any
+}
