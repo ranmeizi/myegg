@@ -10,7 +10,9 @@ enum ResponseCode {
 	// 100003-登录-验证失败
 	Login_VerificationFail = 100003,
 	// 100004-注册-重复的用户名
-	Regist_SameUname = 10004
+	Regist_SameUname = 100004,
+	// 100005-注册-注册失败
+	Regist_Wrong = 100005,
 }
 
 export default ResponseCode;

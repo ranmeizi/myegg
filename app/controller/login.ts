@@ -18,20 +18,25 @@ export default class login extends Controller {
 		ctx.body = await ctx.service.response.format(code);
 	}
 	public async regist() {
-		const { ctx } = this
+		const { ctx } = this;
 		const { ResponseCode } = this.ctx.app.locals;
-		const { uname, psw } = ctx.request.body
+		const { uname, psw } = ctx.request.body;
 		// 查询 uname 是否存在
-		if (ctx.service.hasUser(uname)) {
+		if (await ctx.service.login.hasUser(uname)) {
 			// 返回错误，已经存在的用户名
 			ctx.body = await ctx.service.response.format(ResponseCode.Regist_SameUname);
+		} else {
+			// 生成 盐和加密后的字符串
+			const salt: string = ctx.service.login.createSalt();
+			const saltyPsw: string = ctx.service.login.createSaltyPsw(psw, salt);
+			console.log(salt, saltyPsw);
+			// 生成新用户
+			const code: number = await ctx.service.login.createNewMember({
+				salt,
+				saltyPsw,
+				uname,
+			});
+			ctx.body = await ctx.service.response.format(code);
 		}
-		// 生成 盐和加密后的字符串 
-		const salt: string = ctx.service.login.createSalt()
-		const saltyPsw = ctx.service.login.createSaltyPsw(psw, salt)
-		console.log(saltyPsw)
-		// 生成新用户
-		const code: number = await ctx.service.login.createNewMember()
-		ctx.body = await ctx.service.response.format(code);
 	}
 }

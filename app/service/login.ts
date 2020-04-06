@@ -1,6 +1,5 @@
 import { Service } from 'egg';
-import { USER_DATA } from '../fack/user';
-import * as CryptoJS from 'crypto-js'
+import * as CryptoJS from 'crypto-js';
 
 export default class login extends Service {
 	public async loginValidate(uname: string, psw: string): Promise<number> {
@@ -26,7 +25,15 @@ export default class login extends Service {
 	 * @param uname 用户名
 	 */
 	public async hasUser(uname: string): Promise<boolean> {
-		return USER_DATA.hasOwnProperty(uname);
+		const { ctx } = this;
+		let result: any[] = [];
+		try {
+			result = await ctx.model.User.getUserByUname(uname);
+		} catch (e) {
+			console.log('[hasUser]', e);
+		}
+		// 有-true 无-false
+		return result.length > 0;
 	}
 	/**
 	 * 密码验证
@@ -35,7 +42,7 @@ export default class login extends Service {
 	 */
 	public async verifPsw(uname: string, psw: string): Promise<boolean> {
 		console.log(uname, psw);
-		return USER_DATA[uname].psw === psw;
+		return true; //USER_DATA[uname].psw === psw;
 	}
 	/**
 	 * 人机验证
@@ -57,30 +64,38 @@ export default class login extends Service {
 	 * 生成盐
 	 */
 	public createSalt(): string {
-		const str: string = 'Pneumonoultramicroscopicsilicovolcanoconiosis'
-		let salt: string = ''
+		const str: string = 'Pneumonoultramicroscopicsilicovolcanoconiosis';
+		let salt: string = '';
 		for (let i = 0; i < 10; i++) {
 			// 随机获取一个字
-			salt += str[Math.round(Math.random() * str.length)]
+			salt += str[Math.round(Math.random() * str.length - 1)];
 		}
-		return salt
+		return salt;
 	}
 	/**
 	 * 生成捣乱的密码密文
-	 * @param salt 
-	 * @param psw 
+	 * @param salt
+	 * @param psw
 	 */
 	public createSaltyPsw(salt: string, psw: string) {
-		const hash: string = CryptoJS.SHA256(psw + salt)
-		return hash
+		const hash: string = CryptoJS.SHA256(psw + salt);
+		return hash.toString();
 	}
 
-	public async createNewMember(): Promise<number> {
-		return 1
+	public async createNewMember({ salt, saltyPsw, uname }): Promise<number> {
+		const { ctx } = this;
+		const { ResponseCode } = ctx.app.locals;
+		let code = ResponseCode.Regist_Success;
+		try {
+			await ctx.model.User.registUser({
+				uname,
+				psw: saltyPsw,
+				salt,
+			});
+		} catch (e) {
+			console.log(e);
+			code = ResponseCode.Regist_Wrong;
+		}
+		return code;
 	}
-
-	public async createUser() {
-
-	}
-
 }
