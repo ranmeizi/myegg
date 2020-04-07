@@ -8,7 +8,10 @@ export default (appInfo: EggAppInfo) => {
 	config.keys = appInfo.name + '_1578573387976_8312';
 
 	// add your egg config in here
-	config.middleware = ['time'];
+	config.middleware = ['time', 'errorHandler'];
+	config.errorHandler = {
+		match: '/api',
+	}
 	// add your special config in here
 	const bizConfig = {
 		sourceUrl: `https://github.com/eggjs/examples/tree/master/${appInfo.name}`,
@@ -34,7 +37,7 @@ export default (appInfo: EggAppInfo) => {
 		host: '127.0.0.1',
 		port: 3306,
 		username: 'root',
-		password: 'xiaozhou222',
+		password: 'UltraTel@5266',
 		// 时区，sequelize有很多自动时间的方法，都是和时区相关的，记得设置成东8区（+08:00）
 		timezone: '+08:00',
 		dialectOptions: {
