@@ -9,7 +9,6 @@ export default class login extends Service {
 	 * @param psw 
 	 */
 	public async getToken(uname: string, psw: string): Promise<object> {
-		console.log('getToken')
 		// 获取此用户
 		const user: any[] = await this.getUser(uname)
 		// 验证有没有此用户
@@ -20,19 +19,26 @@ export default class login extends Service {
 		const salt = user?.[0].salt
 		const saltPsw = user?.[0].psw
 		// 使用盐加密用户的psw
-		const uPsw = await this.createSaltyPsw(salt, psw)
+		const uPsw = await this.createSaltyPsw(psw, salt)
 
+		console.log(uPsw, saltPsw)
 		if (uPsw !== saltPsw) {
 			console.log('密码错误')
 			throw new CustError(CST_ERR_CODE.Login_WrongPass)
 		}
 
 		// 获取token
-		//生成 token 的方式
-		const token = this.app.jwt.sign(user, this.app.config.jwt.secret);
+		let uinfo = {
+			...user[0],
+			psw: '淡黄色长裙',
+			salt: '蓬松的头发'
+		}
+		const token = this.app.jwt.sign(uinfo, this.app.config.jwt.secret, {
+			expiresIn:'1d'
+		});
 		return {
 			token,
-			uinfo: user
+			uinfo
 		}
 	}
   /**
@@ -78,7 +84,7 @@ export default class login extends Service {
 	 * @param salt
 	 * @param psw
 	 */
-	public async createSaltyPsw(salt: string, psw: string): Promise<string> {
+	public async createSaltyPsw(psw: string, salt: string): Promise<string> {
 		const hash: string = CryptoJS.SHA256(psw + salt);
 		return hash.toString();
 	}
