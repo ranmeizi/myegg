@@ -1,10 +1,6 @@
-var CST_ERR_CODE = require('./app/CONST/CST_ERR_CODE').default;
 // app.js
 class AppBootHook {
 	constructor(app) {
-		app.locals = {
-			CST_ERR_CODE,
-		};
 		this.app = app;
 	}
 

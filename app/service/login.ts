@@ -1,31 +1,49 @@
 import { Service } from 'egg';
 import * as CryptoJS from 'crypto-js';
+import { CustError, CST_ERR_CODE } from '../middleware/errorHandler'
 
 export default class login extends Service {
-	public async loginValidate(uname: string, psw: string): Promise<number> {
-		const { ResponseCode } = this.ctx.app.locals;
+	/**
+	 * 验证用户名密码，返回token
+	 * @param uname 
+	 * @param psw 
+	 */
+	public async getToken(uname: string, psw: string): Promise<object> {
+		console.log('getToken')
 		// 获取此用户
 		const user: any[] = await this.getUser(uname)
 		// 验证有没有此用户
 		if (user.length === 0) {
-			return ResponseCode.Login_NoUser;
+			throw new CustError(CST_ERR_CODE.Login_NoUser)
 		}
 		// 验证密码
 		const salt = user?.[0].salt
 		const saltPsw = user?.[0].psw
 		// 使用盐加密用户的psw
-		const uPsw = this.createSaltyPsw(salt, psw)
+		const uPsw = await this.createSaltyPsw(salt, psw)
 
 		if (uPsw !== saltPsw) {
-			return ResponseCode.Login_WrongPass;
-		} else {
-			// 生成token
-			return ResponseCode.Login_Success;
+			console.log('密码错误')
+			throw new CustError(CST_ERR_CODE.Login_WrongPass)
+		}
+
+		// 获取token
+		//生成 token 的方式
+		const token = this.app.jwt.sign(user, this.app.config.jwt.secret);
+		return {
+			token,
+			uinfo: user
 		}
 	}
-
-	public async hasUser(uname: string){
-		
+  /**
+	 * 检查是否有相同的用户名
+	 * @param uname 
+	 */
+	public async checkSameUser(uname: string): Promise<void> {
+		let user = await this.getUser(uname)
+		if (user.length > 0) {
+			throw new CustError(CST_ERR_CODE.Regist_SameUname)
+		}
 	}
 	/**
 	 * 查询用户
@@ -44,17 +62,9 @@ export default class login extends Service {
 	}
 
 	/**
-	 * 发token
-	 * @param uname 用户名
-	 */
-	public async getToken(uname: string) {
-		console.log(uname);
-		return 'woshi token';
-	}
-	/**
 	 * 生成盐
 	 */
-	public createSalt(): string {
+	public async createSalt(): Promise<string> {
 		const str: string = 'Pneumonoultramicroscopicsilicovolcanoconiosis';
 		let salt: string = '';
 		for (let i = 0; i < 10; i++) {
@@ -68,25 +78,26 @@ export default class login extends Service {
 	 * @param salt
 	 * @param psw
 	 */
-	public createSaltyPsw(salt: string, psw: string) {
+	public async createSaltyPsw(salt: string, psw: string): Promise<string> {
 		const hash: string = CryptoJS.SHA256(psw + salt);
 		return hash.toString();
 	}
 
-	public async createNewMember({ salt, saltyPsw, uname }): Promise<number> {
+	/**
+	 * createNewMember 新建普通用户
+	 * @param uname 
+	 * @param salt 
+	 * @param saltyPsw 
+	 */
+	public async createNewMember(uname: string, psw: string): Promise<void> {
 		const { ctx } = this;
-		const { ResponseCode } = ctx.app.locals;
-		let code = ResponseCode.Regist_Success;
-		try {
-			await ctx.model.User.registUser({
-				uname,
-				psw: saltyPsw,
-				salt,
-			});
-		} catch (e) {
-			console.log(e);
-			code = ResponseCode.Regist_Wrong;
-		}
-		return code;
+		// 生成 盐和加密后的字符串
+		const salt: string = await this.createSalt();
+		const saltyPsw: string = await this.createSaltyPsw(psw, salt);
+		await ctx.model.User.registUser({
+			uname,
+			psw: saltyPsw,
+			salt,
+		});
 	}
 }
