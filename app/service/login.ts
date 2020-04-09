@@ -34,7 +34,7 @@ export default class login extends Service {
 			salt: '蓬松的头发'
 		}
 		const token = this.app.jwt.sign(uinfo, this.app.config.jwt.secret, {
-			expiresIn:'1d'
+			expiresIn: '1d'
 		});
 		return {
 			token,
@@ -100,10 +100,6 @@ export default class login extends Service {
 		// 生成 盐和加密后的字符串
 		const salt: string = await this.createSalt();
 		const saltyPsw: string = await this.createSaltyPsw(psw, salt);
-		await ctx.model.User.registUser({
-			uname,
-			psw: saltyPsw,
-			salt,
-		});
+		await ctx.model.User.registUser(uname, saltyPsw, salt);
 	}
 }
